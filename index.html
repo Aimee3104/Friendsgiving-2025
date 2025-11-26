@@ -120,23 +120,38 @@
       Thank you! Your RSVP has been recorded. 🦃
     </div>
 
-        <!-- 🧁 Menu Section (added) -->
+    <!-- 🧁 Menu Section -->
     <div class="mt-8">
       <h2 class="text-lg font-semibold text-gray-800 mb-2">🧁 Menu</h2>
       <p class="text-gray-600 mb-3">
         Here’s a peek at what we’ll have for Friendsgiving — come hungry. 😌
       </p>
-      <!-- Replace src with your actual menu image file -->
       <img
         src="friendsgiving-menu.png"
         alt="Friendsgiving Menu"
         class="w-full rounded-xl shadow mb-3"
       />
-      <!-- Optional: quick text list under the picture -->
       <ul class="text-gray-700 text-sm list-disc list-inside">
         <li>Menu is subject to small changes on the day 🌟</li>
-        <li>Total Expenses will be splited among.</li>
+        <li>Total expenses will be split among everyone.</li>
       </ul>
+    </div>
+
+    <!-- 👥 Guest List Section (AUTO) -->
+    <div class="mt-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">👥 Guest List</h2>
+      <p class="text-gray-600 mb-3 text-sm">
+        This list updates automatically based on RSVPs from the form.
+      </p>
+
+      <div id="guestSummary" class="text-sm text-amber-800 font-medium mb-2 hidden">
+        <!-- Filled by JS -->
+      </div>
+
+      <div id="guestListWrapper" class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <p id="guestLoading" class="text-gray-500 text-sm">Loading guest list...</p>
+        <ul id="guestList" class="text-gray-800 text-sm space-y-1 list-disc list-inside"></ul>
+      </div>
     </div>
 
     <!-- Location -->
@@ -158,8 +173,11 @@
 
   </div>
 
-  <!-- Form Script -->
+  <!-- Form + Guest List Script -->
   <script>
+    // 🔗 Paste your Apps Script web app URL here:
+    const GUEST_API_URL = 'https://script.google.com/macros/s/AKfycbzNxKuMb-kwvIuE2cNqZ02NDo0FtWXl9y4yhzi5jJ9tshRuWEiDcfVKjZKgWumG5ChT/exec';
+
     function toggleFakie(value) {
       const fakie = document.getElementById('fakieMessage');
       if (value.startsWith("No")) {
@@ -218,15 +236,70 @@
         mode: 'no-cors',
         body: formData
       }).then(() => {
-        // hide form, show thank-you
         document.getElementById('rsvpForm').classList.add('hidden');
         document.getElementById('thankYou').classList.remove('hidden');
+
+        // Give Google a second to write to the sheet, then reload guests
+        setTimeout(loadGuestList, 1500);
       }).catch(() => {
         alert("Something went wrong, please try again later.");
       });
 
       return false;
     }
+
+    async function loadGuestList() {
+      const guestList = document.getElementById('guestList');
+      const loading = document.getElementById('guestLoading');
+      const summary = document.getElementById('guestSummary');
+
+      if (!GUEST_API_URL || GUEST_API_URL.includes('PASTE_YOUR_WEB_APP_URL_HERE')) {
+        loading.textContent = "Guest list API URL not set yet.";
+        return;
+      }
+
+      loading.textContent = "Loading guest list...";
+
+      try {
+        const res = await fetch(GUEST_API_URL);
+        const data = await res.json();
+
+        guestList.innerHTML = '';
+
+        if (!data.guests || data.guests.length === 0) {
+          loading.textContent = "No RSVPs yet. Be the first to reply!";
+          summary.classList.add('hidden');
+          return;
+        }
+
+        loading.classList.add('hidden');
+
+        data.guests.forEach(g => {
+          const li = document.createElement('li');
+          const statusEmoji = g.attendance.startsWith('Yes')
+            ? '✅'
+            : g.attendance.startsWith('No')
+              ? '❌'
+              : '❓';
+
+          const countText = g.count && g.count > 1
+            ? ` (x${g.count} people)`
+            : '';
+
+          li.textContent = `${statusEmoji} ${g.name} – ${g.attendance}${countText}`;
+          guestList.appendChild(li);
+        });
+
+        summary.textContent = `Total people expected (including guests): ${data.totalPeople}`;
+        summary.classList.remove('hidden');
+
+      } catch (err) {
+        console.error(err);
+        loading.textContent = "Couldn’t load guest list. Please try again later.";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadGuestList);
   </script>
 
 </body>
