@@ -47,12 +47,17 @@
 
     <!-- RSVP Form -->
     <form
-      action="https://docs.google.com/forms/d/e/1FAIpQLSeMb_wr68LOkmCSrlATYWqnp4GuaD26KDd-91Mi8ejiwlL_MQ/viewform"
-      method="POST"
-      target="_blank"
-      id="rsvpForm"
-      class="space-y-4"
-      onsubmit="return validateForm()">
+  action="https://docs.google.com/forms/d/e/1FAIpQLSewBgAhHAUYvXxs83rc23fN2BaNuS9ykiBJEN9bX8QXQqpUZg/formResponse"
+  method="POST"
+  id="rsvpForm"
+  class="space-y-4"
+  onsubmit="return handleSubmit(event)">
+
+
+      <div id="thankYou" class="hidden mt-4 text-center text-green-700 font-semibold">
+  Thank you! Your RSVP has been recorded. 🦃
+</div>
+
 
       <!-- Name -->
       <!-- ⚠️ Make sure this entry ID matches your Google Form -->
@@ -141,50 +146,76 @@
   </div>
 
   <!-- Form Script -->
-  <script>
-    function toggleFakie(value) {
-      const fakie = document.getElementById('fakieMessage');
-      if (value === "No") {
-        fakie.classList.remove('hidden');
-      } else {
-        fakie.classList.add('hidden');
-      }
+<script>
+  function toggleFakie(value) {
+    const fakie = document.getElementById('fakieMessage');
+    if (value === "No") {
+      fakie.classList.remove('hidden');
+    } else {
+      fakie.classList.add('hidden');
+    }
+  }
+
+  function validateForm() {
+    const name = document.querySelector('input[name="entry.381883311"]');
+    const email = document.querySelector('input[name="entry.97539824"]');
+    const attendanceValue = document.getElementById('attendance').value;
+
+    const errorName = document.getElementById('errorName');
+    const errorEmail = document.getElementById('errorEmail');
+    const errorAttendance = document.getElementById('errorAttendance');
+
+    // Reset all errors
+    errorName.classList.add('hidden');
+    errorEmail.classList.add('hidden');
+    errorAttendance.classList.add('hidden');
+
+    let valid = true;
+
+    if (name.value.trim() === "") {
+      errorName.classList.remove('hidden');
+      valid = false;
     }
 
-    function validateForm() {
-      const name = document.querySelector('input[name="entry.381883311"]');
-      const email = document.querySelector('input[name="entry.97539824"]');
-      const attendanceValue = document.getElementById('attendance').value;
-
-      const errorName = document.getElementById('errorName');
-      const errorEmail = document.getElementById('errorEmail');
-      const errorAttendance = document.getElementById('errorAttendance');
-
-      // Reset all errors
-      errorName.classList.add('hidden');
-      errorEmail.classList.add('hidden');
-      errorAttendance.classList.add('hidden');
-
-      let valid = true;
-
-      if (name.value.trim() === "") {
-        errorName.classList.remove('hidden');
-        valid = false;
-      }
-
-      if (email.value.trim() === "") {
-        errorEmail.classList.remove('hidden');
-        valid = false;
-      }
-
-      if (attendanceValue === "") {
-        errorAttendance.classList.remove('hidden');
-        valid = false;
-      }
-
-      return valid;
+    if (email.value.trim() === "") {
+      errorEmail.classList.remove('hidden');
+      valid = false;
     }
-  </script>
+
+    if (attendanceValue === "") {
+      errorAttendance.classList.remove('hidden');
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  function handleSubmit(event) {
+    if (!validateForm()) {
+      return false;
+    }
+
+    event.preventDefault(); // stop normal form submit
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
+    }).then(() => {
+      // Hide form, show thank-you
+      document.getElementById('rsvpForm').classList.add('hidden');
+      document.getElementById('thankYou').classList.remove('hidden');
+    }).catch(() => {
+      alert("Something went wrong, please try again later.");
+    });
+
+    return false;
+  }
+</script>
+
 
 </body>
 </html>
