@@ -120,38 +120,22 @@
       Thank you! Your RSVP has been recorded. 🦃
     </div>
 
-    <!-- 🧁 Menu Section -->
+        <!-- 🧁 Menu Section (added) -->
     <div class="mt-8">
-      <h2 class="text-lg font-semibold text-gray-800 mb-2">🧁 Menu</h2>
       <p class="text-gray-600 mb-3">
         Here’s a peek at what we’ll have for Friendsgiving — come hungry. 😌
       </p>
-      <h2 class="text-lg font-semibold text-gray-1300 mb-2">Total expenses will be split among everyone.</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-2">Total Expenses will be splited among.</h2>
+      <!-- Replace src with your actual menu image file -->
       <img
         src="friendsgiving-menu.png"
         alt="Friendsgiving Menu"
         class="w-full rounded-xl shadow mb-3"
       />
+      <!-- Optional: quick text list under the picture -->
       <ul class="text-gray-700 text-sm list-disc list-inside">
         <li>Menu is subject to small changes on the day 🌟</li>
       </ul>
-    </div>
-
-    <!-- 👥 Guest List Section (AUTO) -->
-    <div class="mt-8">
-      <h2 class="text-lg font-semibold text-gray-800 mb-2">👥 Guest List</h2>
-      <p class="text-gray-600 mb-3 text-sm">
-        This list updates automatically based on RSVPs from the form.
-      </p>
-
-      <div id="guestSummary" class="text-sm text-amber-800 font-medium mb-2 hidden">
-        <!-- Filled by JS -->
-      </div>
-
-      <div id="guestListWrapper" class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-        <p id="guestLoading" class="text-gray-500 text-sm">Loading guest list...</p>
-        <ul id="guestList" class="text-gray-800 text-sm space-y-1 list-disc list-inside"></ul>
-      </div>
     </div>
 
     <!-- Location -->
@@ -172,6 +156,77 @@
     </div>
 
   </div>
+
+  <!-- Form Script -->
+  <script>
+    function toggleFakie(value) {
+      const fakie = document.getElementById('fakieMessage');
+      if (value.startsWith("No")) {
+        fakie.classList.remove('hidden');
+      } else {
+        fakie.classList.add('hidden');
+      }
+    }
+
+    function validateForm() {
+      const name = document.querySelector('input[name="entry.145399973"]');
+      const email = document.querySelector('input[name="entry.1557240136"]');
+      const attendanceValue = document.getElementById('attendance').value;
+
+      const errorName = document.getElementById('errorName');
+      const errorEmail = document.getElementById('errorEmail');
+      const errorAttendance = document.getElementById('errorAttendance');
+
+      // Reset all errors
+      errorName.classList.add('hidden');
+      errorEmail.classList.add('hidden');
+      errorAttendance.classList.add('hidden');
+
+      let valid = true;
+
+      if (name.value.trim() === "") {
+        errorName.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (email.value.trim() === "") {
+        errorEmail.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (attendanceValue === "") {
+        errorAttendance.classList.remove('hidden');
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    function handleSubmit(event) {
+      if (!validateForm()) {
+        return false;
+      }
+
+      event.preventDefault(); // stop normal submit
+
+      const form = event.target;
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      }).then(() => {
+        // hide form, show thank-you
+        document.getElementById('rsvpForm').classList.add('hidden');
+        document.getElementById('thankYou').classList.remove('hidden');
+      }).catch(() => {
+        alert("Something went wrong, please try again later.");
+      });
+
+      return false;
+    }
+  </script>
 
 </body>
 </html>
