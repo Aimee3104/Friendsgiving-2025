@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Friendsgiving 2025 RSVP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 🔥 Fakie Animation -->
+  <style>
+    @keyframes fakieShake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+      75% { transform: rotate(-10deg); }
+      100% { transform: rotate(0deg); }
+    }
+    .animate-fakie {
+      animation: fakieShake 0.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-orange-50 flex justify-center items-center min-h-screen px-4 py-8">
+
+  <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-xl w-full">
+    
+    <!-- Banner Image -->
+    <!-- Update this image file to your Friendsgiving banner -->
+    <img src="friendsgiving-banner.png" alt="Friendsgiving Banner" class="rounded-xl mb-6 w-full shadow"/>
+
+    <!-- Header -->
+    <h1 class="text-3xl font-extrabold text-center text-amber-700 mb-2">🦃 Friendsgiving 2025</h1>
+    <p class="text-center text-gray-600 mb-4">
+      Come eat, chill, and be cozy with us for Friendsgiving!
+    </p>
+
+    <!-- Date & Time -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
+      <p class="text-sm text-gray-600 font-medium mb-1">📅 Date & Time</p>
+      <p class="text-lg font-semibold text-amber-800">
+        Friday, November 28, 2025 · 6:00 PM
+      </p>
+    </div>
+
+    <ul class="text-gray-700 text-sm mb-4 list-disc list-inside">
+      <li>Food, snacks, desserts, and drinks 🧁🍷</li>
+      <li>Board games, music, and cozy chaos 😈</li>
+      <li>Come as you are — no dress code!</li>
+    </ul>
+
+    <!-- RSVP Form -->
+    <form
+      action="https://docs.google.com/forms/d/e/1FAIpQLSewBgAhHAUYvXxs83rc23fN2BaNuS9ykiBJEN9bX8QXQqpUZg/formResponse"
+      method="POST"
+      target="_blank"
+      id="rsvpForm"
+      class="space-y-4"
+      onsubmit="return validateForm()">
+
+      <!-- Name -->
+      <!-- ⚠️ Make sure this entry ID matches your Google Form -->
+      <input
+        type="text"
+        name="entry.381883311"
+        placeholder="Your Name"
+        required
+        class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+      />
+      <p id="errorName" class="text-red-500 text-sm hidden">Please enter your name.</p>
+
+      <!-- Email -->
+      <!-- ⚠️ Make sure this entry ID matches your Google Form -->
+      <input
+        type="email"
+        name="entry.97539824"
+        placeholder="Your Email"
+        required
+        class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+      />
+      <p id="errorEmail" class="text-red-500 text-sm hidden">Please enter a valid email.</p>
+
+      <!-- Attendance -->
+      <!-- ⚠️ Make sure this entry ID matches your Google Form -->
+      <select
+        name="entry.939711493"
+        id="attendance"
+        required
+        class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+        onchange="toggleFakie(this.value)"
+      >
+        <option value="">Will you attend?</option>
+        <option value="Yes">Yes, I’ll be there 🎉</option>
+        <option value="No">No, I can’t make it 😢</option>
+      </select>
+      <p id="errorAttendance" class="text-red-500 text-sm hidden">Please select attendance status.</p>
+
+      <!-- Optional: Number of Guests -->
+      <!-- ⚠️ Update entry ID to match your Google Form if you add this question -->
+      <input
+        type="number"
+        min="1"
+        max="10"
+        name="entry.1234567890"
+        placeholder="How many people including you? (optional)"
+        class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+      />
+
+      <!-- Optional: Dietary Restrictions -->
+      <!-- ⚠️ Update entry ID if needed -->
+      <textarea
+        name="entry.0987654321"
+        placeholder="Any dietary restrictions or allergies? (optional)"
+        rows="3"
+        class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-400"
+      ></textarea>
+
+      <!-- FAKIE message for No -->
+      <div
+        id="fakieMessage"
+        class="hidden text-red-700 text-6xl sm:text-7xl md:text-8xl font-extrabold text-center mt-8 animate-fakie"
+      >
+        FAKIE🖕
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-xl transition"
+      >
+        Submit RSVP
+      </button>
+    </form>
+
+    <!-- Location -->
+    <div class="mt-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">📍 Location</h2>
+      <!-- Replace with your real place & address -->
+      <p class="text-gray-600 mb-2">
+        [Your Friendsgiving Spot] — [Address Here]
+      </p>
+      <!-- Update the map link once you know the location -->
+      <iframe
+        src="https://www.google.com/maps?q=Boston,+MA&output=embed"
+        width="100%"
+        height="250"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        class="rounded-xl"
+      ></iframe>
+    </div>
+
+  </div>
+
+  <!-- Form Script -->
+  <script>
+    function toggleFakie(value) {
+      const fakie = document.getElementById('fakieMessage');
+      if (value === "No") {
+        fakie.classList.remove('hidden');
+      } else {
+        fakie.classList.add('hidden');
+      }
+    }
+
+    function validateForm() {
+      const name = document.querySelector('input[name="entry.381883311"]');
+      const email = document.querySelector('input[name="entry.97539824"]');
+      const attendanceValue = document.getElementById('attendance').value;
+
+      const errorName = document.getElementById('errorName');
+      const errorEmail = document.getElementById('errorEmail');
+      const errorAttendance = document.getElementById('errorAttendance');
+
+      // Reset all errors
+      errorName.classList.add('hidden');
+      errorEmail.classList.add('hidden');
+      errorAttendance.classList.add('hidden');
+
+      let valid = true;
+
+      if (name.value.trim() === "") {
+        errorName.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (email.value.trim() === "") {
+        errorEmail.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (attendanceValue === "") {
+        errorAttendance.classList.remove('hidden');
+        valid = false;
+      }
+
+      return valid;
+    }
+  </script>
+
+</body>
+</html>
