@@ -126,6 +126,7 @@
       <p class="text-gray-600 mb-3">
         Here’s a peek at what we’ll have for Friendsgiving — come hungry. 😌
       </p>
+      <h2 class="text-lg font-semibold text-gray-900 mb-2">Total expenses will be split among everyone.</h2>
       <img
         src="friendsgiving-menu.png"
         alt="Friendsgiving Menu"
@@ -133,7 +134,6 @@
       />
       <ul class="text-gray-700 text-sm list-disc list-inside">
         <li>Menu is subject to small changes on the day 🌟</li>
-        <li>Total expenses will be split among everyone.</li>
       </ul>
     </div>
 
@@ -172,135 +172,6 @@
     </div>
 
   </div>
-
-  <!-- Form + Guest List Script -->
-  <script>
-    // 🔗 Paste your Apps Script web app URL here:
-    const GUEST_API_URL = 'https://script.google.com/macros/s/AKfycbzNxKuMb-kwvIuE2cNqZ02NDo0FtWXl9y4yhzi5jJ9tshRuWEiDcfVKjZKgWumG5ChT/exec';
-
-    function toggleFakie(value) {
-      const fakie = document.getElementById('fakieMessage');
-      if (value.startsWith("No")) {
-        fakie.classList.remove('hidden');
-      } else {
-        fakie.classList.add('hidden');
-      }
-    }
-
-    function validateForm() {
-      const name = document.querySelector('input[name="entry.145399973"]');
-      const email = document.querySelector('input[name="entry.1557240136"]');
-      const attendanceValue = document.getElementById('attendance').value;
-
-      const errorName = document.getElementById('errorName');
-      const errorEmail = document.getElementById('errorEmail');
-      const errorAttendance = document.getElementById('errorAttendance');
-
-      // Reset all errors
-      errorName.classList.add('hidden');
-      errorEmail.classList.add('hidden');
-      errorAttendance.classList.add('hidden');
-
-      let valid = true;
-
-      if (name.value.trim() === "") {
-        errorName.classList.remove('hidden');
-        valid = false;
-      }
-
-      if (email.value.trim() === "") {
-        errorEmail.classList.remove('hidden');
-        valid = false;
-      }
-
-      if (attendanceValue === "") {
-        errorAttendance.classList.remove('hidden');
-        valid = false;
-      }
-
-      return valid;
-    }
-
-    function handleSubmit(event) {
-      if (!validateForm()) {
-        return false;
-      }
-
-      event.preventDefault(); // stop normal submit
-
-      const form = event.target;
-      const formData = new FormData(form);
-
-      fetch(form.action, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
-      }).then(() => {
-        document.getElementById('rsvpForm').classList.add('hidden');
-        document.getElementById('thankYou').classList.remove('hidden');
-
-        // Give Google a second to write to the sheet, then reload guests
-        setTimeout(loadGuestList, 1500);
-      }).catch(() => {
-        alert("Something went wrong, please try again later.");
-      });
-
-      return false;
-    }
-
-    async function loadGuestList() {
-      const guestList = document.getElementById('guestList');
-      const loading = document.getElementById('guestLoading');
-      const summary = document.getElementById('guestSummary');
-
-      if (!GUEST_API_URL || GUEST_API_URL.includes('https://script.google.com/macros/s/AKfycbzNxKuMb-kwvIuE2cNqZ02NDo0FtWXl9y4yhzi5jJ9tshRuWEiDcfVKjZKgWumG5ChT/exec')) {
-        loading.textContent = "Guest list API URL not set yet.";
-        return;
-      }
-
-      loading.textContent = "Loading guest list...";
-
-      try {
-        const res = await fetch(https://script.google.com/macros/s/AKfycbzNxKuMb-kwvIuE2cNqZ02NDo0FtWXl9y4yhzi5jJ9tshRuWEiDcfVKjZKgWumG5ChT/exec);
-        const data = await res.json();
-
-        guestList.innerHTML = '';
-
-        if (!data.guests || data.guests.length === 0) {
-          loading.textContent = "No RSVPs yet. Be the first to reply!";
-          summary.classList.add('hidden');
-          return;
-        }
-
-        loading.classList.add('hidden');
-
-        data.guests.forEach(g => {
-          const li = document.createElement('li');
-          const statusEmoji = g.attendance.startsWith('Yes')
-            ? '✅'
-            : g.attendance.startsWith('No')
-              ? '❌'
-              : '❓';
-
-          const countText = g.count && g.count > 1
-            ? ` (x${g.count} people)`
-            : '';
-
-          li.textContent = `${statusEmoji} ${g.name} – ${g.attendance}${countText}`;
-          guestList.appendChild(li);
-        });
-
-        summary.textContent = `Total people expected (including guests): ${data.totalPeople}`;
-        summary.classList.remove('hidden');
-
-      } catch (err) {
-        console.error(err);
-        loading.textContent = "Couldn’t load guest list. Please try again later.";
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadGuestList);
-  </script>
 
 </body>
 </html>
